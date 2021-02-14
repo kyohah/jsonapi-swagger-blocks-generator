@@ -1,8 +1,8 @@
 class <%= model.camelcase %>
   include Swagger::Blocks
   <%- model_name = "#{model}".split("::").last || model -%>
-  <%- attributes =  "#{namespace}::#{model_name.camelcase}Resource".constantize._attributes -%>
-  <%- relationships = "#{namespace}::#{model_name.camelcase}Resource".constantize._relationships -%>
+  <%- attributes =  "#{namespace}::#{model_name.camelcase}Serializer".constantize.attributes_to_serialize -%>
+  <%- relationships = "#{namespace}::#{model_name.camelcase}Serializer".constantize.relationships_to_serialize -%>
 
   swagger_schema :<%= model_name.singularize.underscore %>_index_response do
     property :data do
@@ -224,12 +224,12 @@ class <%= model.camelcase %>
     <%- end -%>
     end
   end
-<%- relationships = "#{namespace}::#{model_name.camelcase}Resource".constantize._relationships -%>
+<%- relationships = "#{namespace}::#{model_name.camelcase}Serializer".safe_constantize&.relationships_to_serialize -%>
 <%- if relationships -%>
-<% relationships.keys.each do |relationship| %>
+<% relationships.each do |relationship, value| %>
   swagger_schema :show_<%= relationship %>_from_<%= model_name.singularize.underscore %>_response do
-  <%- relation_relationships = "#{namespace}::#{relationship.to_s.camelcase.singularize}Resource".constantize._relationships -%>
-  <%- relation_attributes = "#{namespace}::#{relationship.to_s.camelcase.singularize}Resource".constantize._attributes -%>
+  <%- relation_relationships = value.serializer&.relationships_to_serialize || "#{namespace}::#{relationship.to_s.camelcase.singularize}Serializer".safe_constantize&.relationships_to_serialize -%>
+  <%- relation_attributes = value.serializer&.attributes_to_serialize || "#{namespace}::#{relationship.to_s.camelcase.singularize}Serializer".safe_constantize&.attributes_to_serialize -%>
     property :data do
       key :type, :array
       items do
