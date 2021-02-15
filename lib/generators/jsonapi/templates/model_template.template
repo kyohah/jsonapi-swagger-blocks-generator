@@ -1,332 +1,674 @@
-class <%= model.camelcase %>
+class <%= model.pluralize.camelcase %>Controller
   include Swagger::Blocks
   <%- model_name = "#{model}".split("::").last || model -%>
-  <%- attributes =  "#{namespace}::#{model_name.camelcase}Serializer".constantize.attributes_to_serialize -%>
-  <%- relationships = "#{namespace}::#{model_name.camelcase}Serializer".constantize.relationships_to_serialize -%>
 
-  swagger_schema :<%= model_name.singularize.underscore %>_index_response do
-    property :data do
-      key :type, :array
-      items do
-        property :id do
-          key :type, :integer
+  swagger_path "/<%= model_name.pluralize.underscore %>" do
+    operation :get do
+      key :summary, "Index <%= model_name.pluralize.underscore %>"
+      key :produces, [
+        "application/vnd.api+json"
+      ]
+      key :tags, [
+        "<%= model_name.singularize.underscore %>"
+      ]
+      response 200 do
+        key :description, "List of all <%= model_name.pluralize.underscore %>"
+        schema do
+          key :"$ref", :<%= model_name.singularize.underscore %>_index_response
         end
-        property :type do
-          key :type, :string
-        end
-      <%- if attributes -%>
-        property :attributes do
-        <%- attributes.keys.each do |attribute| -%>
-          property :<%= attribute %> do
-            key :type, :string
-          end
-        <%- end -%>
-        end
-      <%- end -%>
-      <%- if relationships -%>
-        property :relationships do
-        <%- relationships.keys.each do |relationship| -%>
-          property :<%= relationship %> do
-            property :links do
-              property :self do
-                key :type, :string
-              end
-              property :related do
-                key :type, :string
-              end
+      end
+      response 401 do
+        key :description, "Unauthorized"
+      end
+      response 404 do
+        key :description, "Not Found"
+      end
+      response :default do
+        key :description, "Unexpected error"
+        schema do 
+          property :errors do
+            property :status do
+              key :type, :integer
+            end
+            property :source do
+              key :type, :string
+            end
+            property :detail do
+              key :type, :string
             end
           end
-        <%- end -%>
         end
-      <%- end -%>
       end
     end
   end
 
-  swagger_schema :<%= model_name.singularize.underscore %>_show_response do
-    property :data do
-      property :id do
+  swagger_path "/<%= model_name.pluralize.underscore %>/{id}" do
+    operation :get do
+      key :summary, "Show <%= model_name.singularize.underscore %>"
+      key :produces, [
+        "application/vnd.api+json"
+      ]
+      key :tags, [
+        "<%= model_name.singularize.underscore %>"
+      ]
+      parameter do
+        key :name, :id
+        key :in, :path
+        key :description, "id of <%= model_name.singularize.underscore %>"
+        key :required, true
         key :type, :integer
       end
-      property :type do
-        key :type, :string
-      end
-      property :links do
-        property :self do
-          key :type, :string
+      response 200 do
+        key :description, "Show <%= model_name.singularize.underscore %>"
+        schema do
+          key :"$ref", :<%= model_name.singularize.underscore %>_show_response
         end
       end
-    <%- if attributes -%>
-      property :attributes do
-      <%- attributes.keys.each do |attribute| -%>
-        property :<%= attribute %> do
-          key :type, :string
-        end
-      <%- end -%>
+      response 401 do
+        key :description, "Unauthorized"
       end
-    <%- end -%>
-    <%- if relationships -%>
-      property :relationships do
-      <%- relationships.keys.each do |relationship| -%>
-        property :<%= relationship %> do
-          property :links do
-            property :self do
+      response 404 do
+        key :description, "Not Found"
+      end
+      response :default do
+        key :description, "Unexpected error"
+        schema do 
+          property :errors do
+            property :status do
+              key :type, :integer
+            end
+            property :source do
               key :type, :string
             end
-            property :related do
+            property :detail do
               key :type, :string
             end
           end
         end
-      <%- end -%>
       end
-    <%- end -%>
     end
   end
 
-  swagger_schema :<%= model_name.singularize.underscore %>_create_response do
-    property :data do
-      property :id do
+  swagger_path "/<%= model_name.pluralize.underscore %>" do
+    operation :post do
+      key :summary, "Create <%= model_name.singularize.underscore %>"
+      key :produces, [
+        "application/vnd.api+json"
+      ]
+      key :tags, [
+        "<%= model_name.singularize.underscore %>"
+      ]
+      parameter do
+        key :name, :<%= model_name.singularize.underscore %>_params
+        key :in, :body
+        key :required, true
+        schema do
+          key :"$ref", :create_<%= model_name.singularize.underscore %>
+        end
+      end
+      response 201 do
+        key :description, "<%= model_name.singularize.underscore %>"
+        schema do
+          key :"$ref", :<%= model_name.singularize.underscore %>_create_response
+        end
+      end
+      response 401 do
+        key :description, "Unauthorized"
+      end
+      response 403 do
+        key :description, "Forbidden"
+        schema do 
+          property :errors do
+            property :status do
+              key :type, :integer
+            end
+            property :source do
+              key :type, :string
+            end
+            property :detail do
+              key :type, :string
+            end
+          end
+        end
+      end
+      response :default do
+        key :description, "Unexpected error"
+        schema do 
+          property :errors do
+            property :status do
+              key :type, :integer
+            end
+            property :source do
+              key :type, :string
+            end
+            property :detail do
+              key :type, :string
+            end
+          end
+        end
+      end
+    end
+  end
+
+  swagger_path "/<%= model_name.pluralize.underscore %>/{id}" do
+    operation :put do
+      key :summary, "Update <%= model_name.singularize.underscore %>"
+      key :produces, [
+        "application/vnd.api+json"
+      ]
+      key :tags, [
+        "<%= model_name.singularize.underscore %>"
+      ]
+      parameter do
+        key :name, :id
+        key :in, :path
+        key :description, "id of <%= model_name.singularize.underscore %>"
+        key :required, true
         key :type, :integer
       end
-      property :type do
-        key :type, :string
-      end
-      property :links do
-        property :self do
-          key :type, :string
+      parameter do
+        key :name, :<%= model_name.singularize.underscore %>_params
+        key :in, :body
+        key :required, true
+        schema do
+          key :"$ref", :update_<%= model_name.singularize.underscore %>
         end
       end
-    <%- if attributes -%>
-      property :attributes do
-      <%- attributes.keys.each do |attribute| -%>
-        property :<%= attribute %> do
-          key :type, :string
+      response 200 do
+        key :description, "<%= model_name.singularize.underscore %>"
+        schema do
+          key :"$ref", :<%= model_name.singularize.underscore %>_create_response
         end
-      <%- end -%>
       end
-    <%- end -%>
-    <%- if relationships -%>
-      property :relationships do
-      <%- relationships.keys.each do |relationship| -%>
-        property :<%= relationship %> do
-          property :links do
-            property :self do
+      response 401 do
+        key :description, "Unauthorized"
+      end
+      response 202 do
+        key :description, "Accepted"
+      end
+      response 204 do
+        key :description, "No Content"
+      end
+      response 403 do
+        key :description, "Forbidden"
+      end
+      response 404 do
+        key :description, "Not Found"
+      end
+      response 409 do
+        key :description, "Conflict"
+      end
+      response :default do
+        key :description, "Unexpected error"
+        schema do 
+          property :errors do
+            property :status do
+              key :type, :integer
+            end
+            property :source do
               key :type, :string
             end
-            property :related do
+            property :detail do
               key :type, :string
             end
           end
         end
-      <%- end -%>
       end
-    <%- end -%>
     end
   end
 
-  swagger_schema :<%= model_name.singularize.underscore %>_update_response do
-    property :data do
-      property :id do
+  swagger_path "/<%= model_name.pluralize.underscore %>/{id}" do
+    operation :patch do
+      key :summary, "Update <%= model_name.singularize.underscore %>"
+      key :produces, [
+        "application/vnd.api+json"
+      ]
+      key :tags, [
+        "<%= model_name.singularize.underscore %>"
+      ]
+      parameter do
+        key :name, :id
+        key :in, :path
+        key :description, "id of <%= model_name.singularize.underscore %>"
+        key :required, true
         key :type, :integer
       end
-      property :type do
-        key :type, :string
-      end
-      property :links do
-        property :self do
-          key :type, :string
+      parameter do
+        key :name, :<%= model_name.singularize.underscore %>_params
+        key :in, :body
+        key :required, true
+        schema do
+          key :"$ref", :update_<%= model_name.singularize.underscore %>
         end
       end
-    <%- if attributes -%>
-      property :attributes do
-      <%- attributes.keys.each do |attribute| -%>
-        property :<%= attribute %> do
-          key :type, :string
+      response 200 do
+        key :description, "<%= model_name.singularize.underscore %>"
+        schema do
+          key :"$ref", :<%= model_name.singularize.underscore %>_create_response
         end
-      <%- end -%>
       end
-    <%- end -%>
-    <%- if relationships -%>
-      property :relationships do
-      <%- relationships.keys.each do |relationship| -%>
-        property :<%= relationship %> do
-          property :links do
-            property :self do
+      response 401 do
+        key :description, "Unauthorized"
+      end
+      response 202 do
+        key :description, "Accepted"
+      end
+      response 204 do
+        key :description, "No Content"
+      end
+      response 403 do
+        key :description, "Forbidden"
+      end
+      response 404 do
+        key :description, "Not Found"
+      end
+      response 409 do
+        key :description, "Conflict"
+      end
+      response :default do
+        key :description, "Unexpected error"
+        schema do 
+          property :errors do
+            property :status do
+              key :type, :integer
+            end
+            property :source do
               key :type, :string
             end
-            property :related do
+            property :detail do
               key :type, :string
             end
           end
         end
-      <%- end -%>
       end
-    <%- end -%>
     end
   end
-
-  swagger_schema :create_<%= model_name.singularize.underscore %> do
-    property :data do
-      property :type do
-        key :type, :string
+  
+  swagger_path "/<%= model_name.pluralize.underscore %>/{id}" do
+    operation :delete do
+      key :summary, "Delete <%= model_name.singularize.underscore %>"
+      key :produces, [
+        "application/vnd.api+json"
+      ]
+      key :tags, [
+        "<%= model_name.singularize.underscore %>"
+      ]
+      parameter do
+        key :name, :id
+        key :in, :path
+        key :description, "id of <%= model_name.singularize.underscore %>"
+        key :required, true
+        key :type, :integer
       end
-    <%- if attributes -%>
-      property :attributes do
-      <%- attributes.keys.each do |attribute| -%>
-        property :<%= attribute %> do
-          key :type, :string
-        end
-      <%- end -%>
+      response 200 do
+        key :description, "Ok"
       end
-    <%- end -%>
-    <%- if relationships -%>
-      property :relationships do
-      <%- relationships.each do |relationship| -%>
-        property :<%= relationship[0] %> do
-          property :data do
-          <%- if relationship[1].class.to_s == "JSONAPI::Relationship::ToOne" -%>
-            property :type do
+      response 202 do
+        key :description, "Accepted"
+      end
+      response 204 do
+        key :description, "No Content"
+      end
+      response 404 do
+        key :description, "Not Found"
+      end
+      response 401 do
+        key :description, "Unauthorized"
+      end
+      response :default do
+        key :description, "Unexpected error"
+        schema do 
+          property :errors do
+            property :status do
+              key :type, :integer
+            end
+            property :source do
               key :type, :string
             end
-            property :id do
+            property :detail do
               key :type, :string
             end
-          <%- elsif relationship[1].class.to_s == "JSONAPI::Relationship::ToMany" -%>
-            property :type do
-              key :type, :string
-            end
-            property :id do
-              key :type, :string
-            end
-          <%- end -%>
           end
         end
-      <%- end -%>
       end
-    <%- end -%>
     end
   end
-
-  swagger_schema :update_<%= model_name.singularize.underscore %> do
-    property :data do
-      property :type do
-        key :type, :string
-      end
-    <%- if attributes -%>
-      property :attributes do
-      <%- attributes.keys.each do |attribute| -%>
-        property :<%= attribute %> do
-          key :type, :string
-        end
-      <%- end -%>
-      end
-    <%- end -%>
-    end
-  end
-<%- relationships = "#{namespace}::#{model_name.camelcase}Serializer".safe_constantize&.relationships_to_serialize -%>
+<%- relationships = "#{namespace}::#{model_name.camelcase}Resource".constantize._relationships -%>
 <%- if relationships -%>
-<% relationships.each do |relationship, value| %>
-  swagger_schema :show_<%= relationship %>_from_<%= model_name.singularize.underscore %>_response do
-  <%- relation_relationships = value.serializer&.relationships_to_serialize || "#{namespace}::#{relationship.to_s.camelcase.singularize}Serializer".safe_constantize&.relationships_to_serialize -%>
-  <%- relation_attributes = value.serializer&.attributes_to_serialize || "#{namespace}::#{relationship.to_s.camelcase.singularize}Serializer".safe_constantize&.attributes_to_serialize -%>
-    property :data do
-      key :type, :array
-      items do
-        property :id do
-          key :type, :integer
+<%- relationships.keys.each do |relationship| -%>
+
+  swagger_path "/<%= model_name.pluralize.underscore %>/{id}/<%= relationship %>" do
+    operation :get do
+      key :summary, "Show <%= relationship %> from <%= model_name.singularize.underscore %>"
+      key :produces, [
+        "application/vnd.api+json"
+      ]
+      key :tags, [
+        "<%= model_name.singularize.underscore %>"
+      ]
+      parameter do
+        key :name, :id
+        key :in, :path
+        key :description, "id of <%= model_name.singularize.underscore %>"
+        key :required, true
+        key :type, :integer
+      end
+      response 200 do
+        key :description, "Show <%= relationship %> from <%= model_name.singularize.underscore %>"
+        schema do
+          key :"$ref", :show_<%= relationship %>_from_<%= model_name.singularize.underscore %>_response
         end
-        property :type do
-          key :type, :string
-        end
-      <%- if relation_attributes -%>
-        property :attributes do
-        <%- relation_attributes.keys.each do |attribute| -%>
-          property :<%= attribute %> do
-            key :type, :string
-          end
-        <%- end -%>
-        end
-      <%- end -%>
-      <%- if relation_relationships -%>
-        property :relationships do
-        <%- relation_relationships.keys.each do |relation_relationship| -%>
-          property :<%= relation_relationship %> do
-            property :links do
-              property :self do
-                key :type, :string
-              end
-              property :related do
-                key :type, :string
-              end
+      end
+      response 401 do
+        key :description, "Unauthorized"
+      end
+      response 403 do
+        key :description, "Forbidden"
+        schema do 
+          property :errors do
+            property :status do
+              key :type, :integer
+            end
+            property :source do
+              key :type, :string
+            end
+            property :detail do
+              key :type, :string
             end
           end
-        <%- end -%>
         end
-      <%- end -%>
       end
-    end
-  end
-
-  swagger_schema :show_<%= relationship %>_from_<%= model_name.singularize.underscore %>_relation_response do
-    property :links do
-      property :self do
-        key :type, :string
+      response 404 do
+        key :description, "Not Found"
       end
-      property :related do
-        key :type, :string
-      end
-    end
-    property :data do
-      key :type, :array
-      items do
-        property :id do
-          key :type, :integer
-        end
-        property :type do
-          key :type, :string
+      response :default do
+        key :description, "Unexpected error"
+        schema do 
+          property :errors do
+            property :status do
+              key :type, :integer
+            end
+            property :source do
+              key :type, :string
+            end
+            property :detail do
+              key :type, :string
+            end
+          end
         end
       end
     end
   end
 
-  swagger_schema :put_<%= relationship %>_from_<%= model_name.singularize.underscore %>_relation_response do
-    property :data do
-      key :type, :array
-      items do
-        property :id do
-          key :type, :integer
+  swagger_path "/<%= model_name.pluralize.underscore %>/{id}/relationships/<%= relationship %>" do
+    operation :get do
+      key :summary, "Show <%= relationship %> from <%= model_name.singularize.underscore %>"
+      key :produces, [
+        "application/vnd.api+json"
+      ]
+      key :tags, [
+        "<%= model_name.singularize.underscore %>"
+      ]
+      parameter do
+        key :name, :id
+        key :in, :path
+        key :description, "id of <%= model_name.singularize.underscore %>"
+        key :required, true
+        key :type, :integer
+      end
+      response 200 do
+        key :description, "Show <%= relationship %> from <%= model_name.singularize.underscore %>"
+        schema do
+          key :"$ref", :show_<%= relationship %>_from_<%= model_name.singularize.underscore %>_relation_response
         end
-        property :type do
-          key :type, :string
+      end
+      response 401 do
+        key :description, "Unauthorized"
+        schema do 
+          property :errors do
+            property :status do
+              key :type, :integer
+            end
+            property :source do
+              key :type, :string
+            end
+            property :detail do
+              key :type, :string
+            end
+          end
+        end
+      end
+      response 403 do
+        key :description, "Forbidden"
+        schema do 
+          property :errors do
+            property :status do
+              key :type, :integer
+            end
+            property :source do
+              key :type, :string
+            end
+            property :detail do
+              key :type, :string
+            end
+          end
+        end
+      end
+      response :default do
+        key :description, "Unexpected error"
+        schema do 
+          property :errors do
+            property :status do
+              key :type, :integer
+            end
+            property :source do
+              key :type, :string
+            end
+            property :detail do
+              key :type, :string
+            end
+          end
         end
       end
     end
   end
 
-  swagger_schema :update_<%= relationship %>_from_<%= model_name.singularize.underscore %>_relation_response do
-    property :data do
-      key :type, :array
-      items do
-        property :id do
-          key :type, :integer
+  swagger_path "/<%= model_name.pluralize.underscore %>/{id}/relationships/<%= relationship %>" do
+    operation :put do
+      key :summary, "Update <%= relationship %> from <%= model_name.singularize.underscore %>"
+      key :produces, [
+        "application/vnd.api+json"
+      ]
+      key :tags, [
+        "<%= model_name.singularize.underscore %>"
+      ]
+      parameter do
+        key :name, :id
+        key :in, :path
+        key :description, "id of <%= model_name.singularize.underscore %>"
+        key :required, true
+        key :type, :integer
+      end
+      response 200 do
+        key :description, "Update <%= relationship %> from <%= model_name.singularize.underscore %>"
+        schema do
+          key :"$ref", :update_<%= relationship %>_from_<%= model_name.singularize.underscore %>_relation_response
         end
-        property :type do
-          key :type, :string
+      end
+      response 202 do
+        key :description, "Accepted"
+      end
+      response 204 do
+        key :description, "No Content"
+      end
+      response 401 do
+        key :description, "Unauthorized"
+      end
+      response 403 do
+        key :description, "Forbidden"
+        schema do 
+          property :errors do
+            property :status do
+              key :type, :integer
+            end
+            property :source do
+              key :type, :string
+            end
+            property :detail do
+              key :type, :string
+            end
+          end
+        end
+      end
+      response :default do
+        key :description, "Unexpected error"
+        schema do 
+          property :errors do
+            property :status do
+              key :type, :integer
+            end
+            property :source do
+              key :type, :string
+            end
+            property :detail do
+              key :type, :string
+            end
+          end
         end
       end
     end
   end
 
-  swagger_schema :delete_<%= relationship %>_from_<%= model_name.singularize.underscore %>_relation_response do
-    property :data do
-      key :type, :array
-      items do
-        property :id do
-          key :type, :integer
+  swagger_path "/<%= model_name.pluralize.underscore %>/{id}/relationships/<%= relationship %>" do
+    operation :post do
+      key :summary, "Update <%= relationship %> from <%= model_name.singularize.underscore %>"
+      key :produces, [
+        "application/vnd.api+json"
+      ]
+      key :tags, [
+        "<%= model_name.singularize.underscore %>"
+      ]
+      parameter do
+        key :name, :id
+        key :in, :path
+        key :description, "id of <%= model_name.singularize.underscore %>"
+        key :required, true
+        key :type, :integer
+      end
+      response 200 do
+        key :description, "Update <%= relationship %> from <%= model_name.singularize.underscore %>"
+        schema do
+          key :"$ref", :update_<%= relationship %>_from_<%= model_name.singularize.underscore %>_relation_response
         end
-        property :type do
-          key :type, :string
+      end
+      response 202 do
+        key :description, "Accepted"
+      end
+      response 204 do
+        key :description, "No Content"
+      end
+      response 401 do
+        key :description, "Unauthorized"
+      end
+      response 403 do
+        key :description, "Forbidden"
+        schema do 
+          property :errors do
+            property :status do
+              key :type, :integer
+            end
+            property :source do
+              key :type, :string
+            end
+            property :detail do
+              key :type, :string
+            end
+          end
+        end
+      end
+      response :default do
+        key :description, "Unexpected error"
+        schema do 
+          property :errors do
+            property :status do
+              key :type, :integer
+            end
+            property :source do
+              key :type, :string
+            end
+            property :detail do
+              key :type, :string
+            end
+          end
+        end
+      end
+    end
+  end
+
+   swagger_path "/<%= model_name.pluralize.underscore %>/{id}/relationships/<%= relationship %>" do
+    operation :delete do
+      key :summary, "Delete <%= relationship %> from <%= model_name.singularize.underscore %>"
+      key :produces, [
+        "application/vnd.api+json"
+      ]
+      key :tags, [
+        "<%= model_name.singularize.underscore %>"
+      ]
+      parameter do
+        key :name, :id
+        key :in, :path
+        key :description, "id of <%= model_name.singularize.underscore %>"
+        key :required, true
+        key :type, :integer
+      end
+      response 200 do
+        key :description, "Delete <%= relationship %> from <%= model_name.singularize.underscore %>"
+        schema do
+          key :"$ref", :delete_<%= relationship %>_from_<%= model_name.singularize.underscore %>_relation_response
+        end
+      end
+      response 202 do
+        key :description, "Accepted"
+      end
+      response 204 do
+        key :description, "No Content"
+      end
+      response 401 do
+        key :description, "Unauthorized"
+      end
+      response 404 do
+        key :description, "Not Found"
+      end
+      response 403 do
+        key :description, "Forbidden"
+        schema do 
+          property :errors do
+            property :status do
+              key :type, :integer
+            end
+            property :source do
+              key :type, :string
+            end
+            property :detail do
+              key :type, :string
+            end
+          end
+        end
+      end
+      response :default do
+        key :description, "Unexpected error"
+        schema do 
+          property :errors do
+            property :status do
+              key :type, :integer
+            end
+            property :source do
+              key :type, :string
+            end
+            property :detail do
+              key :type, :string
+            end
+          end
         end
       end
     end
