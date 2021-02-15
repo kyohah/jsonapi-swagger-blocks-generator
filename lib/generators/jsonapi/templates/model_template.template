@@ -17,7 +17,6 @@ class <%= model.camelcase %>
       <%- if attributes -%>
         property :attributes do
         <%- attributes.keys.each do |attribute| -%>
-          <%- binding.pry -%>
           property :<%= attribute %>, type: :string
         <%- end -%>
         end
